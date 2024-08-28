@@ -24,6 +24,7 @@ public class Consumer {
             log.info("Created file in: " + tempFile.toString());
             file = new File(tempFile.toString());
         } catch (IOException e) {
+            log.error("IOException " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -39,13 +40,18 @@ public class Consumer {
             boolean append = file.length() > 0;
             String numAsString = (append) ? ", " + Long.toString(n) : Long.toString(n);
 
-            try {
-                FileUtils.writeStringToFile(file, numAsString, StandardCharsets.UTF_8, append);
-                log.info("Appending to file: " + numAsString);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            writeToFile(numAsString, append);
 
+        }
+    }
+
+    private void writeToFile(String numAsString, boolean append) {
+        try {
+            FileUtils.writeStringToFile(file, numAsString, StandardCharsets.UTF_8, append);
+            log.info("Appending to file: " + numAsString);
+        } catch (IOException e) {
+            log.error("IOException " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 

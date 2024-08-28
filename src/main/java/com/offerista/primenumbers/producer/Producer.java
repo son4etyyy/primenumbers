@@ -35,24 +35,34 @@ public class Producer {
         String stringData = intStream
                 .mapToObj(String::valueOf)
                 .collect(Collectors.joining(", "));
+
+        sendToListener(stringData);
+
+        writeToFile(stringData);
+    }
+
+    private void sendToListener(String stringData) {
         String[] parts = stringData.split(Pattern.quote(","));
-        // send to listener
         long waitTime = 5000;
         for(String s: parts) {
             send(s);
             try {
                 Thread.sleep(waitTime); //up to 5 numbers per second / filled stream size of maximum 100 numbers
             } catch (InterruptedException e) {
+                log.error("InterruptedException " + e.getMessage());
                 throw new RuntimeException(e);
             }
         }
+    }
 
+    private static void writeToFile(String stringData) {
         File targetFile;
         try {
             targetFile = Files.createTempFile("primeNumbers", ".csv").toFile();
             FileUtils.writeStringToFile(targetFile, stringData, StandardCharsets.UTF_8);
             log.info("Writing to file: " + stringData);
         } catch (IOException e) {
+            log.error("IOException " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
